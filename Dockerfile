@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     nginx \
     supervisor \
     mariadb-server \
+    openssl \
     curl \
     wget \
     unzip \
@@ -35,16 +36,21 @@ RUN mkdir -p /var/www/html/phpmyadmin && \
     mv /tmp/phpMyAdmin-*-all-languages/* /var/www/html/phpmyadmin/ && \
     rm -rf /tmp/pma.zip /tmp/phpMyAdmin-*-all-languages
 
-# Page d'accueil
-RUN echo "<h1>ft_server</h1><ul><li><a href="/wordpress/">WordPress</a></li><li><a href="/phpmyadmin/">phpMyAdmin</a></li></ul>" > /var/www/html/index.html
+# Page d'accueil (liens relatifs)
+RUN printf '%s\n' \
+'<h1>ft_server</h1>' \
+'<ul>' \
+'  <li><a href="/wordpress/">WordPress</a></li>' \
+'  <li><a href="/phpmyadmin/">phpMyAdmin</a></li>' \
+'</ul>' \
+> /var/www/html/index.html
 
-# Config nginx + supervisor
 COPY conf/nginx-site.conf /etc/nginx/sites-available/default
 COPY conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-EXPOSE 80
+EXPOSE 80 443
 
 ENTRYPOINT ["/entrypoint.sh"]

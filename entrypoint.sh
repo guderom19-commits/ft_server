@@ -5,12 +5,15 @@ mkdir -p /run/nginx
 mkdir -p /run/php
 mkdir -p /var/log/supervisor
 mkdir -p /var/run/mysqld
+mkdir -p /etc/ssl/ft_server
 
 chown -R mysql:mysql /var/run/mysqld
 chown -R mysql:mysql /var/lib/mysql
 
-# ---- AUTOINDEX via ENV ----
-# Usage: docker run ... -e AUTOINDEX=on  (ou off)
+# -------------------------
+# AUTOINDEX via ENV
+# docker run ... -e AUTOINDEX=on (ou off)
+# -------------------------
 AUTOINDEX_VALUE="${AUTOINDEX:-off}"
 
 if [ "$AUTOINDEX_VALUE" = "on" ]; then
@@ -21,7 +24,21 @@ else
     sed -i 's/# AUTOINDEX_PLACEHOLDER/autoindex off;/' /etc/nginx/sites-available/default
 fi
 
-# ---- Init MariaDB ----
+# -------------------------
+# SSL autosigné (bonus)
+# -------------------------
+if [ ! -f /etc/ssl/ft_server/ft_server.crt ] || [ ! -f /etc/ssl/ft_server/ft_server.key ]; then
+    echo "[i] Generating self-signed SSL certificate..."
+    openssl req -x509 -nodes -days 365 \
+      -newkey rsa:2048 \
+      -keyout /etc/ssl/ft_server/ft_server.key \
+      -out /etc/ssl/ft_server/ft_server.crt \
+      -subj "/C=FR/ST=IDF/L=Paris/O=ft_server/OU=dev/CN=127.0.0.1"
+fi
+
+# -------------------------
+# Init MariaDB + création DB/user
+# -------------------------
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     echo "[i] Initializing MariaDB..."
     mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
