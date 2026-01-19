@@ -9,9 +9,11 @@ RUN sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /
 RUN apt-get update && apt-get install -y \
     nginx \
     supervisor \
+    php-fpm \
+    php-mysql \
     && rm -rf /var/lib/apt/lists/*
 
-RUN echo "<h1>It works (Debian Buster + Nginx)</h1>" > /var/www/html/index.html
+RUN echo "<?php phpinfo(); ?>" > /var/www/html/index.php
 
 COPY conf/nginx-site.conf /etc/nginx/sites-available/default
 COPY conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
