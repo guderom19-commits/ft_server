@@ -9,14 +9,34 @@ RUN sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /
 RUN apt-get update && apt-get install -y \
     nginx \
     supervisor \
-    php-fpm \
-    php-mysql \
     mariadb-server \
     curl \
+    wget \
+    unzip \
+    php-fpm \
+    php-mysql \
+    php-curl \
+    php-gd \
+    php-mbstring \
+    php-xml \
+    php-zip \
+    php-json \
+    php-cli \
     && rm -rf /var/lib/apt/lists/*
 
-# Page test PHP
-RUN echo "<?php phpinfo(); ?>" > /var/www/html/index.php
+# WordPress
+RUN mkdir -p /var/www/html/wordpress && \
+    curl -L https://wordpress.org/latest.tar.gz | tar -xz --strip-components=1 -C /var/www/html/wordpress
+
+# phpMyAdmin
+RUN mkdir -p /var/www/html/phpmyadmin && \
+    curl -L https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.zip -o /tmp/pma.zip && \
+    unzip /tmp/pma.zip -d /tmp && \
+    mv /tmp/phpMyAdmin-*-all-languages/* /var/www/html/phpmyadmin/ && \
+    rm -rf /tmp/pma.zip /tmp/phpMyAdmin-*-all-languages
+
+# Page d'accueil
+RUN echo "<h1>ft_server</h1><ul><li><a href="/wordpress/">WordPress</a></li><li><a href="/phpmyadmin/">phpMyAdmin</a></li></ul>" > /var/www/html/index.html
 
 # Config nginx + supervisor
 COPY conf/nginx-site.conf /etc/nginx/sites-available/default
