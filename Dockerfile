@@ -11,10 +11,14 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     php-fpm \
     php-mysql \
+    mariadb-server \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Page test PHP
 RUN echo "<?php phpinfo(); ?>" > /var/www/html/index.php
 
+# Config nginx + supervisor
 COPY conf/nginx-site.conf /etc/nginx/sites-available/default
 COPY conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
