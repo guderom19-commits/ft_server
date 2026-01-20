@@ -51,7 +51,7 @@ docker run -d -p 8080:80 -p 8443:443 -e AUTOINDEX=off --name ft_server ft_server
 Ouvrir :
 - https://127.0.0.1:8443/
 
-Le certificat est autosigné, donc le navigateur affichera un avertissement de sécurité (normal).
+    Le certificat est autosigné, donc le navigateur affichera un avertissement de sécurité (normal).
 
 ---
 
